@@ -63,21 +63,7 @@ function saveLocal(key, value) {
   }
 }
 
-function readLocal(key, fallback) {
-  try {
-    const saved = localStorage.getItem(key);
-    return saved !== null ? JSON.parse(saved) : fallback;
-  } catch {
-    return fallback;
-  }
-}
 
-function saveLocal(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.error("Erreur de sauvegarde :", error);  }
-}
 const dateLabel = (date) => new Date(date+"T12:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
 const initials = (name="") => name.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase();
 
