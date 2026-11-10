@@ -46,22 +46,7 @@ const money = (n) => new Intl.NumberFormat("fr-FR", {
 }).format(n || 0);
 
 // Sauvegarde locale gratuite de SalonFlow
-function readLocal(key, fallback) {
-  try {
-    const saved = localStorage.getItem(key);
-    return saved !== null ? JSON.parse(saved) : fallback;
-  } catch {
-    return fallback;
-  }
-}
 
-function saveLocal(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.error("Erreur de sauvegarde :", error);
-  }
-}
 
 
 const dateLabel = (date) => new Date(date+"T12:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
