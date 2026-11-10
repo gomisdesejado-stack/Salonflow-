@@ -38,7 +38,46 @@ const demoBookings = [
   { id:"b6", client_name:"Emma Laurent", service_name:"Coloration", date:isoDay(shiftDay(today,1)), time:"13:00", duration:90, price:85, status:"pending", color:"peach" },
   { id:"b7", client_name:"Lucas Bernard", service_name:"Coupe homme", date:isoDay(shiftDay(today,2)), time:"15:00", duration:30, price:28, status:"confirmed", color:"blue" }
 ];
-const money = (n) => new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n || 0);
+ 
+const money = (n) => new Intl.NumberFormat("fr-FR", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 0
+}).format(n || 0);
+
+// Sauvegarde locale gratuite de SalonFlow
+function readLocal(key, fallback) {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved !== null ? JSON.parse(saved) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveLocal(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error("Erreur de sauvegarde :", error);
+  }
+}
+
+function readLocal(key, fallback) {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved !== null ? JSON.parse(saved) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveLocal(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error("Erreur de sauvegarde :", error);  }
+}
 const dateLabel = (date) => new Date(date+"T12:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
 const initials = (name="") => name.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase();
 
@@ -47,16 +86,27 @@ function App() {
   const [authReady,setAuthReady] = useState(!supabase);
   const [page,setPage] = useState("dashboard");
   const [mobileOpen,setMobileOpen] = useState(false);
-  const [bookings,setBookings] = useState(demoBookings);
-  const [clients,setClients] = useState(demoClients);
-  const [services,setServices] = useState(demoServices);
+const [bookings,setBookings] = useState(() =>
+  readLocal("salonflow_bookings", demoBookings)
+);
+
+const [clients,setClients] = useState(() =>
+  readLocal("salonflow_clients", demoClients)
+);
+
+const [services,setServices] = useState(() =>
+  readLocal("salonflow_services", demoServices)
+);
+
   const [selectedDate,setSelectedDate] = useState(isoDay(today));
   const [search,setSearch] = useState("");
   const [modal,setModal] = useState("");
   const [toast,setToast] = useState("");
   const [loading,setLoading] = useState(false);
   const [userEmail,setUserEmail] = useState("");
-  const [salonName,setSalonName] = useState("Atelier Camille");
+  const [salonName,setSalonName] = useState(
+  () => readLocal("salonflow_name", "Atelier Camille")
+);
 
   useEffect(() => {
     if (!supabase) return;
@@ -65,6 +115,22 @@ function App() {
     return () => subscription.unsubscribe();
   },[]);
   useEffect(()=>{ if(toast){const t=setTimeout(()=>setToast(""),2800);return()=>clearTimeout(t);} },[toast]);
+useEffect(() => {
+  saveLocal("salonflow_bookings", bookings);
+}, [bookings]);
+
+useEffect(() => {
+  saveLocal("salonflow_clients", clients);
+}, [clients]);
+
+useEffect(() => {
+  saveLocal("salonflow_services", services);
+}, [services]);
+
+useEffect(() => {
+  saveLocal("salonflow_name", salonName);
+}, [salonName]);
+
 
   useEffect(() => {
     if (!supabase || !session?.user) return;
