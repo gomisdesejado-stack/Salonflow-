@@ -232,7 +232,7 @@ function NavItem({icon,label,active,onClick,count}){return <button className={`n
 function Dashboard({todayBookings,revenue,upcoming,setPage,setModal,updateStatus}) {
   const confirmed=todayBookings.filter(b=>b.status==="confirmed").length;
   return <div className="fade-in">
-    <div className="welcome-row"><div><div className="eyebrow">MARDI, 18 JUIN 2024</div><h1>Bonjour Camille <span>✦</span></h1><p>Voici ce qui se passe dans votre salon aujourd'hui.</p></div><button className="primary-btn" onClick={()=>setModal("booking")}><Plus size={17}/> Nouveau rendez-vous</button></div>
+    <div className="welcome-row"><div><div className="eyebrow">MARDI, 18 JUIN 2024</div><h1>Bonjour Rasta barber <span>✦</span></h1><p>Voici ce qui se passe dans votre salon aujourd'hui.</p></div><button className="primary-btn" onClick={()=>setModal("booking")}><Plus size={17}/> Nouveau rendez-vous</button></div>
     <div className="stats-grid">
       <StatCard label="Rendez-vous aujourd'hui" value={todayBookings.length} note={`${confirmed} confirmés`} icon={<CalendarCheck/>} tone="purple"/>
       <StatCard label="Chiffre d'affaires du jour" value={money(revenue)} note="Sur les rendez-vous du jour" icon={<Euro/>} tone="green"/>
