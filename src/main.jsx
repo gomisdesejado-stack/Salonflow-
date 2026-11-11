@@ -45,8 +45,8 @@ const money = (n) => new Intl.NumberFormat("fr-FR", {
   maximumFractionDigits: 0
 }).format(n || 0);
 
-// Sauvegarde locale gratuite de SalonFlowfunction readLocal(key, fallback) {
-  function readLocal(key, fallback) {
+// Sauvegarde locale gratuite de SalonFlow
+function readLocal(key, fallback) {
   try {
     const saved = localStorage.getItem(key);
     return saved !== null ? JSON.parse(saved) : fallback;
@@ -54,7 +54,6 @@ const money = (n) => new Intl.NumberFormat("fr-FR", {
     return fallback;
   }
 }
-  
 
 function saveLocal(key, value) {
   try {
