@@ -67,7 +67,16 @@ function saveLocal(key, value) {
 
 const dateLabel = (date) => new Date(date+"T12:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
 const initials = (name="") => name.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase();
-
+async function envoyerReservation(data) {
+  await fetch("https://script.google.com/macros/s/AKfycbyprf3JM3nhfBqmQKpYaZB0BC9CQX2NJQ-0H7HKtLP5iETJIkEsD9R0c0smHJHkibaL/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(data)
+  });
+}
 function App() {
   const [session,setSession] = useState(null);
   const [authReady,setAuthReady] = useState(!supabase);
