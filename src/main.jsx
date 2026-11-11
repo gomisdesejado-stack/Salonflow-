@@ -71,7 +71,7 @@ const initials = (name="") => name.split(" ").map(x=>x[0]).slice(0,2).join("").t
 
 function App() {
   const [session,setSession] = useState(null);
-  const [authReady,setAuthReady] = useState(!supabase);
+  const [authReady,setAuthReady] = useState(!supabase);const [pinUnlocked,setPinUnlocked] = const [savedPin,setSavedPin] = useState(() => localStorage.getItem("salonflow_pin") || "");useState(false);
   const [page,setPage] = useState("dashboard");
   const [mobileOpen,setMobileOpen] = useState(false);
 const [bookings,setBookings] = useState(() =>
