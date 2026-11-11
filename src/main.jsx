@@ -207,7 +207,7 @@ useEffect(() => {
 
   if(!authReady) return <div className="loading-screen"><LoaderCircle className="spin"/> Chargement…</div>;
    
-if(supabase && !session) return <AuthScreen/>;
+if(new URLSearchParams(window.location.search).get("booking")==="1") return <PublicBooking services={services}/>;if(supabase && !session) return <AuthScreen/>;
 if(!pinUnlocked) return <PinScreen savedPin={savedPin} setSavedPin={setSavedPin} onUnlock={()=>setPinUnlocked(true)}/>;
 
   return <div className="app-shell">
