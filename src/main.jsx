@@ -186,7 +186,9 @@ useEffect(() => {
   const filteredClients = clients.filter(c=>(c.name+" "+(c.email||"")+" "+(c.phone||"")).toLowerCase().includes(search.toLowerCase()));
 
   if(!authReady) return <div className="loading-screen"><LoaderCircle className="spin"/> Chargement…</div>;
-  if(supabase && !session) return <AuthScreen/>;if(!pinUnlocked) return <PinScreen savedPin={savedPin} setSavedPin={setSavedPin} pinInput={pinInput} setPinInput={setPinInput} onUnlock={()=>setPinUnlocked(true)}/>;
+   if(!authReady) return <div className="loading-screen"><LoaderCircle className="spin"/> Chargement…</div>;
+if(supabase && !session) return <AuthScreen/>;
+if(!pinUnlocked) return <PinScreen savedPin={savedPin} setSavedPin={setSavedPin} pinInput={pinInput} setPinInput={setPinInput} onUnlock={()=>setPinUnlocked(true)}/>;savedPin={savedPin} setSavedPin={setSavedPin} pinInput={pinInput} setPinInput={setPinInput} onUnlock={()=>setPinUnlocked(true)}/>;
 
   return <div className="app-shell">
     <aside className={`sidebar ${mobileOpen?"open":""}`}>
@@ -285,7 +287,74 @@ function SettingsPage({salonName,setSalonName,userEmail,cloud}){return <div clas
 function Modal({title,subtitle,onClose,children}){return <div className="modal-backdrop" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><div className="modal"><div className="modal-head"><div><h2>{title}</h2><p>{subtitle}</p></div><button className="icon-btn" onClick={onClose}><X/></button></div>{children}</div></div>}
 function BookingModal({clients,services,onClose,onSave}){const [form,setForm]=useState({client_id:"",client_name:"",service_id:services[0]?.id||"",date:isoDay(today),time:"09:00",email:"",phone:""});const [newClient,setNewClient]=useState(false);const set=(k,v)=>setForm(p=>({...p,[k]:v}));return <Modal title="Nouveau rendez-vous" subtitle="Ajoutez une réservation au planning." onClose={onClose}><form onSubmit={e=>{e.preventDefault();onSave(form)}} className="modal-form"><label>Client<select value={form.client_id} onChange={e=>{set("client_id",e.target.value);setNewClient(e.target.value==="new");}} required><option value="">Sélectionner un client</option>{clients.map(c=><option value={c.id} key={c.id}>{c.name}</option>)}<option value="new">+ Nouveau client</option></select></label>{newClient&&<><label>Nom du client<input required value={form.client_name} onChange={e=>set("client_name",e.target.value)}/></label><label>Email<input type="email" value={form.email} onChange={e=>set("email",e.target.value)}/></label><label>Téléphone<input value={form.phone} onChange={e=>set("phone",e.target.value)}/></label></>}<label>Prestation<select value={form.service_id} onChange={e=>set("service_id",e.target.value)}>{services.map(s=><option value={s.id} key={s.id}>{s.name} · {money(s.price)} · {s.duration} min</option>)}</select></label><div className="form-two"><label>Date<input type="date" value={form.date} onChange={e=>set("date",e.target.value)} required/></label><label>Heure<input type="time" value={form.time} onChange={e=>set("time",e.target.value)} required/></label></div><div className="modal-actions"><button type="button" className="secondary-btn" onClick={onClose}>Annuler</button><button className="primary-btn" type="submit">Créer le rendez-vous</button></div></form></Modal>}
 function ServiceModal({onClose,onSave}){const [d,setD]=useState({name:"",price:"",duration:"30"});return <Modal title="Nouvelle prestation" subtitle="Ajoutez un service à votre carte." onClose={onClose}><form className="modal-form" onSubmit={e=>{e.preventDefault();onSave(d)}}><label>Nom de la prestation<input required placeholder="Ex. Coupe femme" value={d.name} onChange={e=>setD({...d,name:e.target.value})}/></label><div className="form-two"><label>Prix (€)<input type="number" min="0" required value={d.price} onChange={e=>setD({...d,price:e.target.value})}/></label><label>Durée (min)<input type="number" min="5" step="5" required value={d.duration} onChange={e=>setD({...d,duration:e.target.value})}/></label></div><div className="modal-actions"><button type="button" className="secondary-btn" onClick={onClose}>Annuler</button><button className="primary-btn">Ajouter la prestation</button></div></form></Modal>}
-function ClientModal({onClose,onSave}){const [d,setD]=useState({name:"",email:"",phone:""});return <Modal title="Ajouter un client" subtitle="Créez une fiche client." onClose={onClose}><form className="modal-form" onSubmit={e=>{e.preventDefault();onSave(d)}}><label>Nom complet<input required value={d.name} onChange={e=>setD({...d,name:e.target.value})}/></label><label>Email<input type="email" value={d.email} onChange={e=>setD({...d,email:e.target.value})}/></label><label>Téléphone<input value={d.phone} onChange={e=>setD({...d,phone:e.target.value})}/></label><div className="modal-actions"><button type="button" className="secondary-btn" onClick={onClose}>Annuler</button><button className="primary-btn">Enregistrer le client</button></div></form></Modal>}
+function ClientModal({onClose,onSave}){const [d,setD]=useState({name:"",email:"",phone:""});return <Modal title="Ajouter un client" subtitle="Créez une fiche client." onClose={onClose}><form className="modal-form" onSubmit={e=>{e.preventDefault();onSave(d)}}><label>Nom complet<input required value={d.name} onChange={e=>setD({...d,name:e.target.value})}/></label><label>Email<input type="email" value={d.email} onChange={e=>setD({...d,email:e.target.value})}/></label><label>Téléphone<input value={d.phone} onChange={e=>setD({...d,phone:e.target.value})}/></label><div className="modal-actions"><button type="button" className="secondary-btn" onClick={onClose}>Annuler</button><button className="primary-btn">Enregistrer le client</button></div></form></Modal>}function PinScreen({savedPin,setSavedPin,onUnlock}) {
+  const [pin,setPin] = useState("");
+  const [confirm,setConfirm] = useState("");
+  const [error,setError] = useState("");
+  const creating = !savedPin;
+
+  function submit(e) {
+    e.preventDefault();
+
+    if (!/^\d{4}$/.test(pin)) {
+      setError("Entre exactement 4 chiffres.");
+      return;
+    }
+
+    if (creating) {
+      if (pin !== confirm) {
+        setError("Les deux codes ne correspondent pas.");
+        return;
+      }
+      localStorage.setItem("salonflow_pin", pin);
+      setSavedPin(pin);
+      onUnlock();
+    } else if (pin === savedPin) {
+      onUnlock();
+    } else {
+      setError("Code incorrect. Réessaie.");
+      setPin("");
+    }
+  }
+
+  return <div className="auth-screen">
+    <div className="auth-card">
+      <h1>RASTA BARBER</h1>
+      <p>{creating ? "Crée ton code PIN à 4 chiffres" : "Entre ton code PIN pour accéder au salon"}</p>
+      <form onSubmit={submit}>
+        <label>Code PIN
+          <input
+            type="password"
+            inputMode="numeric"
+            maxLength="4"
+            value={pin}
+            onChange={e=>setPin(e.target.value.replace(/\D/g,""))}
+            placeholder="4 chiffres"
+            required
+          />
+        </label>
+
+        {creating && <label>Confirme ton code PIN
+          <input
+            type="password"
+            inputMode="numeric"
+            maxLength="4"
+            value={confirm}
+            onChange={e=>setConfirm(e.target.value.replace(/\D/g,""))}
+            placeholder="Répète les 4 chiffres"
+            required
+          />
+        </label>}
+
+        {error && <p className="auth-error">{error}</p>}
+
+        <button className="primary-btn full-btn" type="submit">
+          {creating ? "Créer mon code" : "Déverrouiller"}
+        </button>
+      </form>
+    </div>
+  </div>;
+}
 
 function AuthScreen(){const [mode,setMode]=useState("login"),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);async function submit(e){e.preventDefault();setBusy(true);setError("");const result=mode==="login"?await supabase.auth.signInWithPassword({email,password}):await supabase.auth.signUp({email,password});setBusy(false);if(result.error)setError(result.error.message);else if(mode==="signup")setError("Vérifiez votre boîte mail pour confirmer votre adresse.");}return <div className="auth-screen"><div className="auth-card"><div className="brand auth-brand"><div className="brand-mark"><Scissors/></div><span>salon<span className="brand-light">flow</span></span></div><h1>{mode==="login"?"Bon retour parmi nous":"Créer votre compte"}</h1><p>Connectez-vous à votre espace de gestion.</p><form onSubmit={submit}><label>Email professionnel<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="vous@salon.fr"/></label><label>Mot de passe<input type="password" minLength="8" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="8 caractères minimum"/></label>{error&&<div className="auth-error">{error}</div>}<button className="primary-btn full-btn" disabled={busy}>{busy?"Chargement…":mode==="login"?"Se connecter":"Créer mon compte"}</button></form><div className="auth-switch">{mode==="login"?"Pas encore de compte ?":"Déjà inscrit ?"} <button onClick={()=>setMode(mode==="login"?"signup":"login")}>{mode==="login"?"Créer un compte":"Se connecter"}</button></div></div></div>}
 
