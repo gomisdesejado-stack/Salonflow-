@@ -186,7 +186,7 @@ useEffect(() => {
   const filteredClients = clients.filter(c=>(c.name+" "+(c.email||"")+" "+(c.phone||"")).toLowerCase().includes(search.toLowerCase()));
 
   if(!authReady) return <div className="loading-screen"><LoaderCircle className="spin"/> Chargement…</div>;
-  if(supabase && !session) return <AuthScreen/>;
+  if(supabase && !session) return <AuthScreen/>;if(!pinUnlocked) return <PinScreen savedPin={savedPin} setSavedPin={setSavedPin} pinInput={pinInput} setPinInput={setPinInput} onUnlock={()=>setPinUnlocked(true)}/>;
 
   return <div className="app-shell">
     <aside className={`sidebar ${mobileOpen?"open":""}`}>
