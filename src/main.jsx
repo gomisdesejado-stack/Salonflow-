@@ -77,9 +77,63 @@ async function envoyerReservation(data) {
     body: JSON.stringify(data)
   });
 }
+function PublicBooking({ services }) {
+  const [client, setClient] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [date, setDate] = useState("");
+  const [heure, setHeure] = useState("");
+  const [prestation, setPrestation] = useState(services[0]?.name || "");
+  const [message, setMessage] = useState("");
+
+  async function envoyer(e) {
+    e.preventDefault();
+    const service = services.find(s => s.name === prestation);
+
+    try {
+      await envoyerReservation({
+        date,
+        heure,
+        client,
+        telephone,
+        prestation,
+        prix: service?.price || 0
+      });
+      setMessage("Demande envoyée ! Le salon vous confirmera le rendez-vous.");
+      setClient("");
+      setTelephone("");
+    } catch (error) {
+      setMessage("Erreur d'envoi. Réessayez plus tard.");
+    }
+  }
+
+  return (
+    <div style={{maxWidth:450, margin:"40px auto", padding:24, fontFamily:"Arial"}}>
+      <h1>RASTA BARBER</h1>
+      <h2>Réserver un rendez-vous</h2>
+      <form onSubmit={envoyer}>
+        <p>Votre nom</p>
+        <input required value={client} onChange={e=>setClient(e.target.value)} placeholder="Votre nom" />
+        <p>Téléphone</p>
+        <input required value={telephone} onChange={e=>setTelephone(e.target.value)} placeholder="Votre téléphone" />
+        <p>Prestation</p>
+        <select value={prestation} onChange={e=>setPrestation(e.target.value)}>
+          {services.map(s=><option key={s.id} value={s.name}>{s.name} - {s.price} €</option>)}
+        </select>
+        <p>Date</p>
+        <input required type="date" min={new Date().toISOString().slice(0,10)} value={date} onChange={e=>setDate(e.target.value)} />
+        <p>Heure</p>
+        <input required type="time" value={heure} onChange={e=>setHeure(e.target.value)} />
+        <button type="submit">Envoyer la réservation</button>
+      </form>
+      <p>{message}</p>
+    </div>
+  );
+}
+
+
 function App() {
   const [session,setSession] = useState(null);
-  const [authReady,setAuthReady] = useState(!supabase);
+  const [authReady,setAuthReady] = useState(!supabase);if(new URLSearchParams(window.location.search).get("booking")==="1") return <PublicBooking services={services}/>;
 const [pinUnlocked,setPinUnlocked] = useState(false);
 const [savedPin,setSavedPin] = useState(() => localStorage.getItem("salonflow_pin") || "");
 const [pinInput,setPinInput] = useState("");
