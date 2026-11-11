@@ -93,7 +93,7 @@ const [services,setServices] = useState(() =>
   const [loading,setLoading] = useState(false);
   const [userEmail,setUserEmail] = useState("");
   const [salonName,setSalonName] = useState(
-  () => readLocal("salonflow_name", "Atelier Camille")
+  () => readLocal("salonflow_name", "Rasta Barber")
 );
 
   useEffect(() => {
