@@ -205,7 +205,7 @@ if(!pinUnlocked) return <PinScreen savedPin={savedPin} setSavedPin={setSavedPin}
         <div className="upgrade-card"><div className="upgrade-icon"><Sparkles size={17}/></div><b>Passez à Pro</b><p>Développez votre salon avec des outils avancés.</p><button onClick={()=>setToast("Les offres seront bientôt disponibles.")}>Découvrir <ArrowUpRight size={14}/></button></div>
         <NavItem icon={<Settings/>} label="Paramètres" active={page==="settings"} onClick={()=>{setPage("settings");setMobileOpen(false)}}/>
         <button className="nav-item logout" onClick={signOut}><LogOut/><span>Déconnexion</span></button>
-        <div className="profile"><div className="profile-avatar">CM</div><div><b>Rasta Barber Moreau</b><small>{userEmail||"Administratrice"}</small></div><MoreHorizontal size={18}/></div>
+        <div className="profile"><div className="profile-avatar">RB</div><div><b>Rasta Barber Moreau</b><small>{userEmail||"Administratrice"}</small></div><MoreHorizontal size={18}/></div>
       </div>
     </aside>
     {mobileOpen&&<div className="mobile-scrim" onClick={()=>setMobileOpen(false)}/>}
