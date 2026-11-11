@@ -167,7 +167,18 @@ useEffect(() => {
     }
     const record = { client_id:clientId, client_name:client?.name || form.client_name,
       service_id:service?.id || null, service_name:service?.name || form.service_name,
-      date:form.date,time:form.time,duration:service?.duration || 30,price:service?.price || 0,status:"confirmed" };
+      date:form.date,time:form.time,duration:service?.duration || 30,price:service?.price || 0,status:"confirmed" };try {
+  await envoyerReservation({
+    date: record.date,
+    heure: record.time,
+    client: record.client_name,
+    telephone: client?.phone || form.phone || "",
+    prestation: record.service_name,
+    prix: record.price
+  });
+} catch (error) {
+  console.error("Erreur Google Sheets :", error);
+}
     if(supabase && session) {
       const {error} = await supabase.from("bookings").insert(record);
       if(error){setToast(error.message);return;}
