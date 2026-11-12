@@ -258,7 +258,7 @@ useEffect(() => {
   const revenue = bookings.filter(b=>b.date===isoDay(today) && b.status!=="cancelled").reduce((a,b)=>a+Number(b.price||0),0);
   const upcoming = [...bookings].filter(b=>b.date>=isoDay(today)&&b.status!=="cancelled").sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,5);
   const filteredClients = clients.filter(c=>(c.name+" "+(c.email||"")+" "+(c.phone||"")).toLowerCase().includes(search.toLowerCase()));
-if(new URLSearchParams(window.location.search).get("booking")==="1") return <div>TEST PUBLIC RASTA BARBER</div>;
+if(new URLSearchParams(window.location.search).get("booking")==="1") return <PublicBooking services={services}/>;
 if(!authReady) return <div className="loading-screen"><LoaderCircle className="spin"/> Chargement…</div>;
    
 
