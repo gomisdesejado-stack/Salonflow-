@@ -1,0 +1,11 @@
+{
+  "name": "Rasta Barber",
+  "short_name": "Rasta Barber",
+  "description": "Réservation de rendez-vous chez Rasta Barber",
+  "start_url": "/?booking=1",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f7f4",
+  "theme_color": "#24212a",
+  "orientation": "portrait"
+}
