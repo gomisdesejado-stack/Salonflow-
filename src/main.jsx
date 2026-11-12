@@ -188,7 +188,46 @@ const [services,setServices] = useState(() =>
   const [salonName,setSalonName] = useState(
   () => readLocal("salonflow_name", "Rasta Barber")
 );
+useEffect(() => {
+  async function synchroniser() {
+    try {
+      const reservations = await chargerReservationsGoogle();
 
+      const nouvelles = reservations.map((r, i) => ({
+        id: "google-" + i + "-" + r.date + "-" + r.heure,
+        client_name: r.client || "Client",
+        service_name: r.prestation || "Prestation",
+        date: String(r.date).slice(0, 10),
+        time: r.heure,
+        duration: 30,
+        price: Number(r.prix) || 0,
+        status: "pending",
+        color: "blue"
+      }));
+
+      setBookings(prev => {
+        const fusion = [...prev];
+
+        nouvelles.forEach(n => {
+          const existe = fusion.some(b =>
+            b.date === n.date &&
+            b.time === n.time &&
+            b.client_name === n.client_name &&
+            b.service_name === n.service_name
+          );
+
+          if (!existe) fusion.push(n);
+        });
+
+        return fusion;
+      });
+    } catch (error) {
+      console.error("Erreur de synchronisation :", error);
+    }
+  }
+
+  synchroniser();
+}, []);
   useEffect(() => {
     if (!supabase) return;
     supabase.auth.getSession().then(({data})=>{setSession(data.session);setAuthReady(true);});
