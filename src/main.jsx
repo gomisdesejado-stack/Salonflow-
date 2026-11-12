@@ -160,9 +160,8 @@ const [savedPin,setSavedPin] = useState(() => localStorage.getItem("salonflow_pi
 const [pinInput,setPinInput] = useState("");
 const [page,setPage] = useState("dashboard");
   const [mobileOpen,setMobileOpen] = useState(false);
-const [bookings,setBookings] = useState(() =>
-  readLocal("salonflow_bookings", demoBookings)
-);
+const [bookings,setBookings] = useState([]);
+
 
 const [clients,setClients] = useState(() =>
   readLocal("salonflow_clients", demoClients)
