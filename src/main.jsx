@@ -77,6 +77,33 @@ async function envoyerReservation(data) {
     body: JSON.stringify(data)
   });
 }
+async function chargerReservationsGoogle() {
+  return new Promise((resolve) => {
+    const callback = "rastaReservations";
+    const script = document.createElement("script");
+    let termine = false;
+
+    const terminer = (reservations = []) => {
+      if (termine) return;
+      termine = true;
+      clearTimeout(delai);
+      delete window[callback];
+      script.remove();
+      resolve(Array.isArray(reservations) ? reservations : []);
+    };
+
+    window[callback] = (reservations) => terminer(reservations);
+    script.onerror = () => terminer([]);
+
+    const delai = setTimeout(() => terminer([]), 10000);
+
+    script.src = "https://script.google.com/macros/s/AKfycbyprf3JM3nhfBqmQKpYaZB0BC9CQX2NJQ-0H7HKtLP5iETJIkEsD9R0c0smHJHkibaL/exec?callback=" + callback;
+
+    document.body.appendChild(script);
+  });
+}
+  
+    
 function PublicBooking({ services: servicesProp }) {
   const services = Array.isArray(servicesProp) ? servicesProp : demoServices;
   const [client, setClient] = useState("");
