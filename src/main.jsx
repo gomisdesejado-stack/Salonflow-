@@ -185,6 +185,7 @@ const [services,setServices] = useState(() =>
   const [toast,setToast] = useState("");
   const [loading,setLoading] = useState(false);
   const [userEmail,setUserEmail] = useState("");
+const [syncing,setSyncing] = useState(false);
   const [salonName,setSalonName] = useState(
   () => readLocal("salonflow_name", "Rasta Barber")
 );
