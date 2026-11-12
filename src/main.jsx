@@ -29,15 +29,8 @@ const demoServices = [
 const today = new Date();
 const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const shiftDay = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
-const demoBookings = [
-  { id:"b1", client_name:"Emma Laurent", service_name:"Coupe femme", date:isoDay(today), time:"09:00", duration:45, price:45, status:"confirmed", color:"lilac" },
-  { id:"b2", client_name:"Lucas Bernard", service_name:"Coupe homme", date:isoDay(today), time:"10:00", duration:30, price:28, status:"confirmed", color:"blue" },
-  { id:"b3", client_name:"Chloé Martin", service_name:"Coloration", date:isoDay(today), time:"11:00", duration:90, price:85, status:"pending", color:"peach" },
-  { id:"b4", client_name:"Nathan Petit", service_name:"Brushing", date:isoDay(today), time:"14:00", duration:30, price:32, status:"confirmed", color:"green" },
-  { id:"b5", client_name:"Sarah Robert", service_name:"Coupe femme", date:isoDay(shiftDay(today,1)), time:"09:30", duration:45, price:45, status:"confirmed", color:"lilac" },
-  { id:"b6", client_name:"Emma Laurent", service_name:"Coloration", date:isoDay(shiftDay(today,1)), time:"13:00", duration:90, price:85, status:"pending", color:"peach" },
-  { id:"b7", client_name:"Lucas Bernard", service_name:"Coupe homme", date:isoDay(shiftDay(today,2)), time:"15:00", duration:30, price:28, status:"confirmed", color:"blue" }
-];
+
+  const demoBookings = [];
  
 const money = (n) => new Intl.NumberFormat("fr-FR", {
   style: "currency",
