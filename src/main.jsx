@@ -401,20 +401,23 @@ if(!pinUnlocked) return <PinScreen savedPin={savedPin} setSavedPin={setSavedPin}
     Espace salon <span>/</span> <b>{pageTitle(page)}</b>
   </div>
 
+  
   <div className="top-actions">
-    <button
-      className="icon-btn"
-      onClick={actualiserReservations}
-      disabled={syncing}
-      title="Actualiser les réservations"
-    >
-      {syncing ? "..." : "↻"}
-    </button>
+  <button
+    className="icon-btn"
+    onClick={actualiserReservations}
+    disabled={syncing}
+    title="Actualiser les réservations"
+  >
+    {syncing ? "..." : "↻"}
+  </button>
 
-    <button className="icon-btn notification" onClick={()=>setToast("Vous êtes à jour !")}>
-      <Bell size={19}/>
-      <i/>
-    </button>
+  <button className="icon-btn notification" onClick={()=>setToast("Vous êtes à jour !")}>
+    <Bell size={19}/>
+    <i/>
+  </button>
+
+  
 
     <div className="top-divider"/>
     <div className="top-user">
@@ -425,8 +428,6 @@ if(!pinUnlocked) return <PinScreen savedPin={savedPin} setSavedPin={setSavedPin}
   </div>
 </header>
   
-function Empty({text}){return <div className="empty-state"><CalendarDays size={25}/><p>{text}</p></div>}
-
 function CalendarPage({bookings,selectedDate,setSelectedDate,setModal,updateStatus}) {
   const date=new Date(selectedDate+"T12:00:00");
   const week=Array.from({length:7},(_,i)=>shiftDay(date,i-3));
