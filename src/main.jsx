@@ -199,7 +199,9 @@ useEffect(() => {
         client_name: r.client || "Client",
         service_name: r.prestation || "Prestation",
         date: String(r.date).slice(0, 10),
-        time: r.heure,
+        time: String(r.heure).includes("T")
+  ? String(r.heure).slice(11, 16)
+  : String(r.heure).slice(0, 5),
         duration: 30,
         price: Number(r.prix) || 0,
         status: "pending",
@@ -241,7 +243,9 @@ useEffect(() => {
       client_name: r.client || "Client",
       service_name: r.prestation || "Prestation",
       date: String(r.date).slice(0, 10),
-      time: r.heure,
+      time: String(r.heure).includes("T")
+  ? String(r.heure).slice(11, 16)
+  : String(r.heure).slice(0, 5),
       duration: 30,
       price: Number(r.prix) || 0,
       status: "pending",
