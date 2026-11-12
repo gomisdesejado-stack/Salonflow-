@@ -419,7 +419,9 @@ if(!pinUnlocked) return <PinScreen savedPin={savedPin} setSavedPin={setSavedPin}
     </div>
   </div>
 </header>
-  
+       </main>
+    </div>;
+} 
 function CalendarPage({bookings,selectedDate,setSelectedDate,setModal,updateStatus}) {
   const date=new Date(selectedDate+"T12:00:00");
   const week=Array.from({length:7},(_,i)=>shiftDay(date,i-3));
