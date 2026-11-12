@@ -133,7 +133,7 @@ function PublicBooking({ services }) {
 
 function App() {
   const [session,setSession] = useState(null);
-  const [authReady,setAuthReady] = useState(!supabase);if(new URLSearchParams(window.location.search).get("booking")==="1") return <PublicBooking services={services}/>;
+  const [authReady,setAuthReady] = useState(!supabase);
 const [pinUnlocked,setPinUnlocked] = useState(false);
 const [savedPin,setSavedPin] = useState(() => localStorage.getItem("salonflow_pin") || "");
 const [pinInput,setPinInput] = useState("");
@@ -258,7 +258,7 @@ useEffect(() => {
   const revenue = bookings.filter(b=>b.date===isoDay(today) && b.status!=="cancelled").reduce((a,b)=>a+Number(b.price||0),0);
   const upcoming = [...bookings].filter(b=>b.date>=isoDay(today)&&b.status!=="cancelled").sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,5);
   const filteredClients = clients.filter(c=>(c.name+" "+(c.email||"")+" "+(c.phone||"")).toLowerCase().includes(search.toLowerCase()));
-if(new URLSearchParams(window.location.search).get("booking")==="1") return <PublicBooking services={services}/>;
+  <PublicBooking services={services}/>;
 if(!authReady) return <div className="loading-screen"><LoaderCircle className="spin"/> Chargement…</div>;
    
 
