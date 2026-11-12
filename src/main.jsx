@@ -201,7 +201,7 @@ useEffect(() => {
       }));
 
       setBookings(prev => {
-        const fusion = [...prev];
+        const fusion = [...nouvelles];
 
         nouvelles.forEach(n => {
           const existe = fusion.some(b =>
@@ -245,7 +245,7 @@ useEffect(() => {
     }));
 
     setBookings(prev => {
-      const fusion = [...prev];
+      const fusion = [...nouvelles];
       nouvelles.forEach(n => {
         const existe = fusion.some(b =>
           b.date === n.date &&
