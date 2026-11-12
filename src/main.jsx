@@ -77,7 +77,8 @@ async function envoyerReservation(data) {
     body: JSON.stringify(data)
   });
 }
-function PublicBooking({ services }) {
+function PublicBooking({ services: servicesProp }) {
+  const services = Array.isArray(servicesProp) ? servicesProp : demoServices;
   const [client, setClient] = useState("");
   const [telephone, setTelephone] = useState("");
   const [date, setDate] = useState("");
