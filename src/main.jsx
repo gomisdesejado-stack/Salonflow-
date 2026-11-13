@@ -219,7 +219,7 @@ useEffect(() => {
 });
 
       setBookings(prev => {
-        const fusion = [...prev];
+        const fusion = [...nouvelles];
 
         nouvelles.forEach(n => {
           const existe = fusion.some(b =>
