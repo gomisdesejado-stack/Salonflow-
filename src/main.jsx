@@ -29,8 +29,15 @@ const demoServices = [
 const today = new Date();
 const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const shiftDay = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
-
-  const demoBookings = [];
+const demoBookings = [
+  { id:"b1", client_name:"Emma Laurent", service_name:"Coupe femme", date:isoDay(today), time:"09:00", duration:45, price:45, status:"confirmed", color:"lilac" },
+  { id:"b2", client_name:"Lucas Bernard", service_name:"Coupe homme", date:isoDay(today), time:"10:00", duration:30, price:28, status:"confirmed", color:"blue" },
+  { id:"b3", client_name:"Chloé Martin", service_name:"Coloration", date:isoDay(today), time:"11:00", duration:90, price:85, status:"pending", color:"peach" },
+  { id:"b4", client_name:"Nathan Petit", service_name:"Brushing", date:isoDay(today), time:"14:00", duration:30, price:32, status:"confirmed", color:"green" },
+  { id:"b5", client_name:"Sarah Robert", service_name:"Coupe femme", date:isoDay(shiftDay(today,1)), time:"09:30", duration:45, price:45, status:"confirmed", color:"lilac" },
+  { id:"b6", client_name:"Emma Laurent", service_name:"Coloration", date:isoDay(shiftDay(today,1)), time:"13:00", duration:90, price:85, status:"pending", color:"peach" },
+  { id:"b7", client_name:"Lucas Bernard", service_name:"Coupe homme", date:isoDay(shiftDay(today,2)), time:"15:00", duration:30, price:28, status:"confirmed", color:"blue" }
+];
  
 const money = (n) => new Intl.NumberFormat("fr-FR", {
   style: "currency",
@@ -160,8 +167,9 @@ const [savedPin,setSavedPin] = useState(() => localStorage.getItem("salonflow_pi
 const [pinInput,setPinInput] = useState("");
 const [page,setPage] = useState("dashboard");
   const [mobileOpen,setMobileOpen] = useState(false);
-const [bookings,setBookings] = useState([]);
-
+const [bookings,setBookings] = useState(() =>
+  readLocal("salonflow_bookings", demoBookings)
+);
 
 const [clients,setClients] = useState(() =>
   readLocal("salonflow_clients", demoClients)
@@ -177,7 +185,6 @@ const [services,setServices] = useState(() =>
   const [toast,setToast] = useState("");
   const [loading,setLoading] = useState(false);
   const [userEmail,setUserEmail] = useState("");
-const [syncing,setSyncing] = useState(false);
   const [salonName,setSalonName] = useState(
   () => readLocal("salonflow_name", "Rasta Barber")
 );
@@ -191,9 +198,7 @@ useEffect(() => {
         client_name: r.client || "Client",
         service_name: r.prestation || "Prestation",
         date: String(r.date).slice(0, 10),
-        time: String(r.heure).includes("T")
-  ? String(r.heure).slice(11, 16)
-  : String(r.heure).slice(0, 5),
+        time: r.heure,
         duration: 30,
         price: Number(r.prix) || 0,
         status: "pending",
@@ -201,7 +206,7 @@ useEffect(() => {
       }));
 
       setBookings(prev => {
-        const fusion = [...nouvelles];
+        const fusion = [...prev];
 
         nouvelles.forEach(n => {
           const existe = fusion.some(b =>
@@ -222,45 +227,7 @@ useEffect(() => {
   }
 
   synchroniser();
-},
-          
-  []);
-  async function actualiserReservations() {
-  setSyncing(true);
-  try {
-    const reservations = await chargerReservationsGoogle();
-
-    const nouvelles = reservations.map((r, i) => ({
-      id: "google-" + i + "-" + r.date + "-" + r.heure,
-      client_name: r.client || "Client",
-      service_name: r.prestation || "Prestation",
-      date: String(r.date).slice(0, 10),
-      time: String(r.heure).includes("T")
-  ? String(r.heure).slice(11, 16)
-  : String(r.heure).slice(0, 5),
-      duration: 30,
-      price: Number(r.prix) || 0,
-      status: "pending",
-      color: "blue"
-    }));
-
-    setBookings(prev => {
-      const fusion = [...nouvelles];
-      nouvelles.forEach(n => {
-        const existe = fusion.some(b =>
-          b.date === n.date &&
-          b.time === n.time &&
-          b.client_name === n.client_name &&
-          b.service_name === n.service_name
-        );
-        if (!existe) fusion.push(n);
-      });
-      return fusion;
-    });
-  } finally {
-    setSyncing(false);
-  }
-}
+}, []);
   useEffect(() => {
     if (!supabase) return;
     supabase.auth.getSession().then(({data})=>{setSession(data.session);setAuthReady(true);});
@@ -385,43 +352,56 @@ if(!pinUnlocked) return <PinScreen savedPin={savedPin} setSavedPin={setSavedPin}
     {mobileOpen&&<div className="mobile-scrim" onClick={()=>setMobileOpen(false)}/>}
     <main className="main-content">
       <header className="topbar">
-  <button className="mobile-menu icon-btn" onClick={()=>setMobileOpen(true)}>
-    <Menu/>
-  </button>
+        <button className="mobile-menu icon-btn" onClick={()=>setMobileOpen(true)}><Menu/></button>
+        <div className="breadcrumb">Espace salon <span>/</span> <b>{pageTitle(page)}</b></div>
+        <div className="top-actions"><button className="icon-btn notification" onClick={()=>setToast("Vous êtes à jour !")}><Bell size={19}/><i/></button><div className="top-divider"/><div className="top-user"><div className="profile-avatar small">CM</div><span>Camille</span><ChevronDown size={15}/></div></div>
+      </header>
+      <div className="page-wrap">
+        {page==="dashboard"&&<Dashboard bookings={bookings} todayBookings={todayBookings} revenue={revenue} upcoming={upcoming} setPage={setPage} setModal={setModal} updateStatus={updateStatus}/>}
+        {page==="calendar"&&<CalendarPage bookings={bookings} selectedDate={selectedDate} setSelectedDate={setSelectedDate} setModal={setModal} updateStatus={updateStatus}/>}
+        {page==="clients"&&<ClientsPage clients={filteredClients} search={search} setSearch={setSearch} setModal={setModal}/>}
+        {page==="services"&&<ServicesPage services={services} setModal={setModal}/>}
+        {page==="settings"&&<SettingsPage salonName={salonName} setSalonName={setSalonName} userEmail={userEmail} cloud={!!supabase}/>}
+      </div>
+    </main>
+    {modal==="booking"&&<BookingModal clients={clients} services={services} onClose={()=>setModal("")} onSave={saveBooking}/>}
+    {modal==="service"&&<ServiceModal onClose={()=>setModal("")} onSave={addService}/>}
+    {modal==="client"&&<ClientModal onClose={()=>setModal("")} onSave={async(d)=>{if(supabase&&session){const {error}=await supabase.from("clients").insert(d);if(error){setToast(error.message);return;}await loadCloudData();}else setClients(p=>[{...d,id:"c"+Date.now(),visits:0,last:"Nouveau client"},...p]);setModal("");setToast("Client ajouté");}}/>}
+    {toast&&<div className="toast"><CheckCircle2 size={17}/>{toast}</div>}
+  </div>;
+}
 
-  <div className="breadcrumb">
-    Espace salon <span>/</span> <b>{pageTitle(page)}</b>
-  </div>
+function pageTitle(p){return ({dashboard:"Vue d'ensemble",calendar:"Réservations",clients:"Clients",services:"Prestations",settings:"Paramètres"})[p];}
+function NavItem({icon,label,active,onClick,count}){return <button className={`nav-item ${active?"active":""}`} onClick={onClick}>{icon}<span>{label}</span>{count>0&&<em>{count}</em>}</button>}
 
-  
-  <div className="top-actions">
-  <button
-    className="icon-btn"
-    onClick={actualiserReservations}
-    disabled={syncing}
-    title="Actualiser les réservations"
-  >
-    {syncing ? "..." : "↻"}
-  </button>
-
-  <button className="icon-btn notification" onClick={()=>setToast("Vous êtes à jour !")}>
-    <Bell size={19}/>
-    <i/>
-  </button>
-
-  
-
-    <div className="top-divider"/>
-    <div className="top-user">
-      <div className="profile-avatar small">CM</div>
-      <span>Camille</span>
-      <ChevronDown size={15}/>
+function Dashboard({todayBookings,revenue,upcoming,setPage,setModal,updateStatus}) {
+  const confirmed=todayBookings.filter(b=>b.status==="confirmed").length;
+  return <div className="fade-in">
+    <div className="welcome-row"><div><div className="eyebrow">MARDI, 18 JUIN 2024</div><h1>Bonjour Rasta barber <span>✦</span></h1><p>Voici ce qui se passe dans votre salon aujourd'hui.</p></div><button className="primary-btn" onClick={()=>setModal("booking")}><Plus size={17}/> Nouveau rendez-vous</button></div>
+    <div className="stats-grid">
+      <StatCard label="Rendez-vous aujourd'hui" value={todayBookings.length} note={`${confirmed} confirmés`} icon={<CalendarCheck/>} tone="purple"/>
+      <StatCard label="Chiffre d'affaires du jour" value={money(revenue)} note="Sur les rendez-vous du jour" icon={<Euro/>} tone="green"/>
+      <StatCard label="Clients reçus" value={confirmed} note="Aujourd'hui" icon={<Users/>} tone="orange"/>
+      <StatCard label="En attente" value={todayBookings.filter(b=>b.status==="pending").length} note="À confirmer" icon={<Clock/>} tone="blue"/>
     </div>
-  </div>
-</header>
-       </main>
-    </div>;
-} 
+    <div className="dashboard-grid">
+      <section className="panel schedule-panel"><div className="panel-head"><div><h2>Prochains rendez-vous</h2><p>Gardez un œil sur votre planning.</p></div><button className="text-btn" onClick={()=>setPage("calendar")}>Tout voir <ArrowUpRight size={15}/></button></div>
+        {upcoming.length? <div className="appointment-list">{upcoming.map((b,i)=><Appointment key={b.id||i} booking={b} updateStatus={updateStatus}/>)}</div>:<Empty text="Aucun rendez-vous à venir."/>}
+      </section>
+      <section className="panel quick-panel"><div className="panel-head"><div><h2>Actions rapides</h2><p>Accédez rapidement aux outils.</p></div></div>
+        <button className="quick-action" onClick={()=>setModal("booking")}><div className="quick-icon lavender"><CalendarDays/></div><span><b>Ajouter un rendez-vous</b><small>Planifier une visite client</small></span><ChevronRight/></button>
+        <button className="quick-action" onClick={()=>setPage("clients")}><div className="quick-icon mint"><UserRound/></div><span><b>Voir les clients</b><small>Consulter votre clientèle</small></span><ChevronRight/></button>
+        <button className="quick-action" onClick={()=>setModal("service")}><div className="quick-icon peach"><Scissors/></div><span><b>Ajouter une prestation</b><small>Gérer votre carte de services</small></span><ChevronRight/></button>
+        <div className="tip-box"><Sparkles size={17}/><div><b>Le conseil du jour</b><p>Envoyez un rappel la veille pour réduire les rendez-vous oubliés.</p></div></div>
+      </section>
+    </div>
+  </div>;
+}
+function StatCard({label,value,note,icon,tone}){return <div className="stat-card"><div className="stat-top"><span>{label}</span><div className={`stat-icon ${tone}`}>{icon}</div></div><div className="stat-value">{value}</div><div className="stat-note">{note}</div></div>}
+function Appointment({booking,updateStatus}){return <div className="appointment-row"><div className="appointment-time">{booking.time}</div><div className={`service-dot ${booking.color||"lilac"}`}/><div className="appointment-main"><b>{booking.client_name}</b><span>{booking.service_name} · {booking.duration||30} min</span></div><div className="appointment-price">{money(booking.price)}</div><Status status={booking.status}/>{booking.status==="pending"&&<button className="tiny-action" title="Confirmer" onClick={()=>updateStatus(booking.id,"confirmed")}><CheckCircle2 size={17}/></button>}</div>}
+function Status({status}){const label={confirmed:"Confirmé",pending:"En attente",cancelled:"Annulé"}[status]||status;return <span className={`status ${status}`}>{label}</span>}
+function Empty({text}){return <div className="empty-state"><CalendarDays size={25}/><p>{text}</p></div>}
+
 function CalendarPage({bookings,selectedDate,setSelectedDate,setModal,updateStatus}) {
   const date=new Date(selectedDate+"T12:00:00");
   const week=Array.from({length:7},(_,i)=>shiftDay(date,i-3));
