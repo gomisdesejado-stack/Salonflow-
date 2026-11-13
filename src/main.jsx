@@ -193,17 +193,30 @@ useEffect(() => {
     try {
       const reservations = await chargerReservationsGoogle();
 
-      const nouvelles = reservations.map((r, i) => ({
-        id: "google-" + i + "-" + r.date + "-" + r.heure,
-        client_name: r.client || "Client",
-        service_name: r.prestation || "Prestation",
-        date: String(r.date).slice(0, 10),
-        time: r.heure,
-        duration: 30,
-        price: Number(r.prix) || 0,
-        status: "pending",
-        color: "blue"
-      }));
+      const nouvelles = reservations.map((r, i) => {
+  const dateObj = new Date(r.date);
+  const heureObj = new Date(r.heure);
+
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(String(r.date))
+    ? String(r.date)
+    : `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,"0")}-${String(dateObj.getDate()).padStart(2,"0")}`;
+
+  const time = /^\d{2}:\d{2}$/.test(String(r.heure))
+    ? String(r.heure)
+    : `${String(heureObj.getHours()).padStart(2,"0")}:${String(heureObj.getMinutes()).padStart(2,"0")}`;
+
+  return {
+    id: "google-" + i + "-" + date + "-" + time,
+    client_name: r.client || "Client",
+    service_name: r.prestation || "Prestation",
+    date: date,
+    time: time,
+    duration: 30,
+    price: Number(r.prix) || 0,
+    status: "pending",
+    color: "blue"
+  };
+});
 
       setBookings(prev => {
         const fusion = [...prev];
